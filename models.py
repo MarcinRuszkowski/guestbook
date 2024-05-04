@@ -1,3 +1,5 @@
+from marshmallow import Schema, fields
+
 from config import db
 
 
@@ -14,3 +16,12 @@ class Entry(db.Model):
             'name': self.name,
             'content': self.content
         }
+    
+
+# class EnterSchema(Schema):
+#     id = fields.Integer()
+#     name = fields.String()
+#     content = fields.String()
+
+
+# enter_schema = EnterSchema()
