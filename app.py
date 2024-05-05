@@ -15,19 +15,21 @@ def get_all_entries():
 
 @app.route('/create_enter', methods=['POST'])
 def create_enter():
-    name = request.json.get('name')
-    content = request.json.get('content')
-
-    if not name or not content:
-        return jsonify({
-            "message": "You must include a name and content."
-                }), 400
-    
-    new_enter = Entry(name=name, content=content)
     try:
+        name = request.json.get('name')
+        content = request.json.get('content')
+
+        if not name or not content:
+            return jsonify({
+                "message": "You must include a name and content."
+                    }), 400
+        
+        new_enter = Entry(name=name, content=content)
+        
         db.session.add(new_enter)
         db.session.commit()
     except Exception as exc:
+        db.session.rollback()
         return jsonify({"message": str(exc)}), 400
 
     return jsonify({
@@ -37,7 +39,7 @@ def create_enter():
 
 @app.route('/update_entry/<int:entry_id>', methods=['PUT'])
 def update_entry(entry_id: int):
-    entry = Entry.query.get_or_404(entry_id, description='Entry does not exist.')
+    entry = Entry.query.get_or_404(entry_id, description=f'Entry with id {entry_id} does not exist.')
     
     data = request.json
     entry.name = data.get('name', entry.name)
@@ -52,7 +54,7 @@ def update_entry(entry_id: int):
 
 @app.route('/delete_entry/<int:entry_id', methods=['DELETE'])
 def delete_entry(entry_id: int):
-    entry = Entry.query.get_or_404(entry_id, description='Entry does not exist.')
+    entry = Entry.query.get_or_404(entry_id, description=f'Entry with id {entry_id} does not exist.')
 
     db.session.delete(entry)
     db.session.commit()
